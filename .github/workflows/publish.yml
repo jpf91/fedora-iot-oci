@@ -24,4 +24,4 @@ jobs:
         ostree pull --repo=repo --mirror fedora-iot:fedora/stable/x86_64/iot
         # ostree container encapsulate --repo=repo fedora/stable/x86_64/iot docker://ghcr.io/jpf91/fedora-iot:$TAG_NAME
         skopeo login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-        rpm-ostree compose container-encapsulate fedora/stable/x86_64/iot docker://ghcr.io/jpf91/fedora-iot:$TAG_NAME
+        rpm-ostree compose container-encapsulate --repo=repo fedora/stable/x86_64/iot docker://ghcr.io/jpf91/fedora-iot:$TAG_NAME
