@@ -1,0 +1,34 @@
+name: publish
+on: [push]
+
+jobs:
+  publish-image:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: GitHub Container Registry Login
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Docker Image Build
+      run: |
+        if [[ "$GITHUB_REF_NAME" == "master" ]]; then export TAG_NAME="latest"; else export TAG_NAME="$GITHUB_REF_NAME"; fi
+        echo "Building jpf91/fedora-iot:$TAG_NAME"
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq ostree < /dev/null
+        ostree init --repo=repo --mode archive
+        echo '' >> repo/config
+        echo '[remote "fedora-iot"]' >> repo/config
+        echo 'url=https://ostree.fedoraproject.org/iot/' >> repo/config
+        echo 'gpg-verify=false' >> repo/config
+        echo 'contenturl=mirrorlist=https://ostree.fedoraproject.org/iot/mirrorlist' >> repo/config
+        ostree --repo=repo pull --mirror fedora-iot:fedora/stable/x86_64/iot
+        ostree container encapsulate --repo=repo fedora/stable/x86_64/iot ghcr.io/jpf91/fedora-iot:$TAG_NAME
+        # This is probably better, but not available on ubuntu...
+        # rpm-ostree compose container-encapsulate fedora/stable/x86_64/iot ghcr.io/jpf91/fedora-iot:$TAG_NAME
+        docker push ghcr.io/jpf91/fedora-iot:$TAG_NAME
