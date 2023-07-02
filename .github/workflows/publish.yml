@@ -1,5 +1,7 @@
-name: publish
-on: [push]
+name: schedule
+on:
+  schedule:
+    - cron: "0 2 * * 0"
 
 jobs:
   publish-image:
