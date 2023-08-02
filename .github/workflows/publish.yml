@@ -25,5 +25,5 @@ jobs:
         echo 'contenturl=mirrorlist=https://ostree.fedoraproject.org/iot/mirrorlist' >> repo/config
         ostree pull --repo=repo --mirror fedora-iot:fedora/stable/x86_64/iot
         # ostree container encapsulate --repo=repo fedora/stable/x86_64/iot docker://ghcr.io/jpf91/fedora-iot:$TAG_NAME
-        skopeo login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-        rpm-ostree compose container-encapsulate --repo=repo fedora/stable/x86_64/iot docker://ghcr.io/jpf91/fedora-iot:$TAG_NAME
+        skopeo login quay.io -u ${{ secrets.QUAY_USER }} -p ${{ secrets.QUAY_PW }}
+        rpm-ostree compose container-encapsulate --repo=repo fedora/stable/x86_64/iot docker://quay.io/jpfau/fedora-iot-oci:$TAG_NAME
